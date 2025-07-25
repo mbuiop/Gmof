@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت سایت و سایت‌های موجود</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .register-form {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .sites-grid {
+            display: grid;
+            gap: 25px;
+        }
+
+        .site-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .site-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .site-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .site-likes {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .like-btn {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .like-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .like-btn.liked {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+        }
+
+        .site-description {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .site-visit {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .site-visit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .register-form {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="location.href='index.html'">← بازگشت</button>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('register')">ثبت سایت</button>
+            <button class="nav-btn" onclick="showSection('sites')">سایت های موجود</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- بخش ثبت سایت -->
+        <div id="register" class="section active">
+            <div class="register-form">
+                <h2 style="color: white; text-align: center; margin-bottom: 30px; font-size: 24px;">ثبت سایت جدید</h2>
+                
+                <form id="siteForm">
+                    <div class="form-group">
+                        <label class="form-label">نام سایت:</label>
+                        <input type="text" class="form-input" id="siteName" placeholder="نام سایت خود را وارد کنید" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">لینک سایت:</label>
+                        <input type="url" class="form-input" id="siteLink" placeholder="https://example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">توضیحات سایت:</label>
+                        <textarea class="form-input form-textarea" id="siteDescription" placeholder="توضیح کاملی از سایت خود ارائه دهید" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ایمیل شما:</label>
+                        <input type="email" class="form-input" id="userEmail" placeholder="your-email@example.com" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">ثبت سایت</button>
+                </form>
+                
+                <div class="success-message" id="successMessage">
+                    سایت شما با موفقیت ثبت شد و پس از تأیید مدیریت در لیست قرار خواهد گرفت.
+                </div>
+            </div>
+        </div>
+
+        <!-- بخش سایت های موجود -->
+        <div id="sites" class="section">
+            <div class="sites-grid" id="sitesContainer">
+                <!-- سایت‌های تایید شده اینجا نمایش داده می‌شوند -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(section) {
+            // پنهان کردن همه بخش‌ها
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // نمایش بخش انتخابی
+            document.getElementById(section).classList.add('active');
+            
+            // به‌روزرسانی دکمه‌های ناوبری
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // بارگذاری سایت‌ها هنگام نمایش بخش سایت‌ها
+            if (section === 'sites') {
+                loadApprovedSites();
+            }
+        }
+
+        // ثبت سایت جدید
+        document.getElementById('siteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const siteData = {
+                name: document.getElementById('siteName').value,
+                link: document.getElementById('siteLink').value,
+                description: document.getElementById('siteDescription').value,
+                email: document.getElementById('userEmail').value,
+                submissionTime: new Date().getTime(),
+                likes: 0,
+                status: 'pending' // در انتظار تایید
+            };
+            
+            // ذخیره در localStorage
+            let pendingSites = JSON.parse(localStorage.getItem('pendingSites') || '[]');
+            pendingSites.push(siteData);
+            localStorage.setItem('pendingSites', JSON.stringify(pendingSites));
+            
+            // نمایش پیام موفقیت
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // پاک کردن فرم
+            document.getElementById('siteForm').reset();
+            
+            // پنهان کردن پیام موفقیت بعد از 5 ثانیه
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 5000);
+        });
+
+        // بارگذاری سایت‌های تایید شده
+        function loadApprovedSites() {
+            const approvedSites = JSON.parse(localStorage.getItem('approvedSites') || '[]');
+            const container = document.getElementById('sitesContainer');
+            
+            if (approvedSites.length === 0) {
+                container.innerHTML = '<div class="empty-message">هیچ سایت تایید شده‌ای موجود نیست</div>';
+                return;
+            }
+            
+            // مرتب‌سازی بر اساس تعداد لایک (بیشترین به کمترین)
+            approvedSites.sort((a, b) => b.likes - a.likes);
+            
+            container.innerHTML = '';
+            approvedSites.forEach((site, index) => {
+                const siteCard = document.createElement('div');
+                siteCard.className = 'site-card';
+                
+                // بررسی اینکه آیا کاربر قبلاً لایک کرده یا نه
+                const likedSites = JSON.parse(localStorage.getItem('userLikes') || '[]');
+                const isLiked = likedSites.includes(site.link);
+                
+                siteCard.innerHTML = `
+                    <div class="site-header">
+                        <div class="site-name">${site.name}</div>
+                        <div class="site-likes">
+                            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="likeSite('${site.link}', this)">
+                                ❤️ ${site.likes}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="site-description">${site.description}</div>
+                    <button class="site-visit" onclick="visitSite('${site.link}')">بازدید از سایت</button>
+                `;
+                container.appendChild(siteCard);
+            });
+        }
+
+        // لایک کردن سایت
+        function likeSite(siteLink, buttonElement) {
+            let likedSites = JSON.parse(localStorage.getItem('userLikes') || '[]');
+            let approvedSites = JSON.parse(localStorage.getItem('approvedSites') || '[]');
+            
+            // یافتن سایت
+            const siteIndex = approvedSites.findIndex(site => site.link === siteLink);
+            if (siteIndex === -1) return;
+            
+            // بررسی اینکه آیا قبلاً لایک شده یا نه
+            if (likedSites.includes(siteLink)) {
+                // حذف لایک
+                likedSites = likedSites.filter(link => link !== siteLink);
+                approvedSites[siteIndex].likes = Math.max(0, approvedSites[siteIndex].likes - 1);
+                buttonElement.classList.remove('liked');
+            } else {
+                // اضافه کردن لایک
+                likedSites.push(siteLink);
+                approvedSites[siteIndex].likes += 1;
+                buttonElement.classList.add('liked');
+            }
+            
+            // ذخیره تغییرات
+            localStorage.setItem('userLikes', JSON.stringify(likedSites));
+            localStorage.setItem('approvedSites', JSON.stringify(approvedSites));
+            
+            // به‌روزرسانی نمایش تعداد لایک
+            buttonElement.innerHTML = `❤️ ${approvedSites[siteIndex].likes}`;
+            
+            // بارگذاری مجدد برای مرتب‌سازی
+            setTimeout(() => {
+                loadApprovedSites();
+            }, 500);
+        }
+
+        // بازدید از سایت
+        function visitSite(link) {
+            window.open(link, '_blank');
+        }
+
+        // اجرای توابع هنگام بارگذاری صفحه
+        window.onload = function() {
+            loadApprovedSites();
+        };
+    </script>
+</body>
+</html>

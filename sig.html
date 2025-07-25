@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیگنال‌ها و تحلیل اندیکاتور</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .signals-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .signal-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .signal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .signal-type {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .signal-time {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .signal-content {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .indicator-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .indicator-description {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .signal-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .buy-signal, .sell-signal {
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .buy-signal {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            color: white;
+        }
+
+        .sell-signal {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .indicator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="location.href='index.html'">← بازگشت</button>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('signals')">سیگنال ها</button>
+            <button class="nav-btn" onclick="showSection('analysis')">تحلیل اندیکاتور</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- بخش سیگنال ها -->
+        <div id="signals" class="section active">
+            <div class="signals-container" id="signalsContainer">
+                <!-- سیگنال ها از localStorage بارگذاری می شوند -->
+            </div>
+        </div>
+
+        <!-- بخش تحلیل اندیکاتور -->
+        <div id="analysis" class="section">
+            <div class="indicator-grid">
+                <div class="indicator-card">
+                    <div class="indicator-title">RSI (شاخص قدرت نسبی)</div>
+                    <div class="indicator-description">
+                        RSI یکی از مهم‌ترین اندیکاتورهای تحلیل تکنیکال است که برای سنجش قدرت خرید و فروش استفاده می‌شود.
+                        زمانی که RSI بالای 70 باشد، نشان‌دهنده اشباع خرید و سیگنال فروش است.
+                        زمانی که RSI زیر 30 باشد، نشان‌دهنده اشباع فروش و سیگنال خرید است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: RSI < 30</span>
+                        <span class="sell-signal">فروش: RSI > 70</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">MACD</div>
+                    <div class="indicator-description">
+                        MACD یک اندیکاتور مومنتوم است که رابطه بین دو میانگین متحرک قیمت را نشان می‌دهد.
+                        وقتی خط MACD از بالا خط سیگنال را قطع کند، سیگنال فروش است.
+                        وقتی خط MACD از پایین خط سیگنال را قطع کند، سیگنال خرید است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: MACD > Signal</span>
+                        <span class="sell-signal">فروش: MACD < Signal</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Bollinger Bands</div>
+                    <div class="indicator-description">
+                        نوارهای بولینگر از سه خط تشکیل شده که نوسانات قیمت را نشان می‌دهند.
+                        وقتی قیمت به نوار بالایی برسد، احتمال ریزش وجود دارد (سیگنال فروش).
+                        وقتی قیمت به نوار پایینی برسد، احتمال صعود وجود دارد (سیگنال خرید).
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: قیمت در نوار پایین</span>
+                        <span class="sell-signal">فروش: قیمت در نوار بالا</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Stochastic</div>
+                    <div class="indicator-description">
+                        استوکاستیک موقعیت بسته شدن فعلی را نسبت به محدوده قیمت در دوره مشخص نشان می‌دهد.
+                        مقادیر بالای 80 نشان‌دهنده اشباع خرید و سیگنال فروش است.
+                        مقادیر زیر 20 نشان‌دهنده اشباع فروش و سیگنال خرید است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: Stochastic < 20</span>
+                        <span class="sell-signal">فروش: Stochastic > 80</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Moving Average (میانگین متحرک)</div>
+                    <div class="indicator-description">
+                        میانگین متحرک روند کلی قیمت را نشان می‌دهد و نوسانات کوتاه‌مدت را هموار می‌کند.
+                        وقتی قیمت بالای میانگین متحرک باشد، روند صعودی است.
+                        وقتی قیمت زیر میانگین متحرک باشد، روند نزولی است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: قیمت > MA</span>
+                        <span class="sell-signal">فروش: قیمت < MA</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Volume (حجم معاملات)</div>
+                    <div class="indicator-description">
+                        حجم معاملات قدرت حرکت قیمت را تایید می‌کند.
+                        افزایش حجم همراه با افزایش قیمت، سیگنال خرید قوی است.
+                        افزایش حجم همراه با کاهش قیمت، سیگنال فروش قوی است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: حجم بالا + قیمت صعودی</span>
+                        <span class="sell-signal">فروش: حجم بالا + قیمت نزولی</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">ADX (شاخص جهت متوسط)</div>
+                    <div class="indicator-description">
+                        ADX قدرت روند را اندازه‌گیری می‌کند بدون اینکه جهت آن را مشخص کند.
+                        مقادیر بالای 25 نشان‌دهنده روند قوی است.
+                        مقادیر زیر 20 نشان‌دهنده روند ضعیف یا بازار خنثی است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">روند قوی: ADX > 25</span>
+                        <span class="sell-signal">روند ضعیف: ADX < 20</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">CCI (شاخص کانال کالا)</div>
+                    <div class="indicator-description">
+                        CCI انحراف قیمت از میانگین آماری آن را اندازه‌گیری می‌کند.
+                        مقادیر بالای +100 نشان‌دهنده اشباع خرید است.
+                        مقادیر زیر -100 نشان‌دهنده اشباع فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: CCI < -100</span>
+                        <span class="sell-signal">فروش: CCI > +100</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Williams %R</div>
+                    <div class="indicator-description">
+                        Williams %R موقعیت بسته شدن را نسبت به محدوده قیمت در دوره مشخص نشان می‌دهد.
+                        مقادیر بالای -20 نشان‌دهنده اشباع خرید است.
+                        مقادیر زیر -80 نشان‌دهنده اشباع فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: Williams %R < -80</span>
+                        <span class="sell-signal">فروش: Williams %R > -20</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Momentum</div>
+                    <div class="indicator-description">
+                        مومنتوم نرخ تغییر قیمت را در دوره زمانی مشخص اندازه‌گیری می‌کند.
+                        مومنتوم مثبت نشان‌دهنده قدرت خرید است.
+                        مومنتوم منفی نشان‌دهنده قدرت فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: مومنتوم مثبت</span>
+                        <span class="sell-signal">فروش: مومنتوم منفی</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">ROC (نرخ تغییر)</div>
+                    <div class="indicator-description">
+                        ROC درصد تغییر قیمت را در دوره زمانی مشخص نشان می‌دهد.
+                        ROC مثبت نشان‌دهنده روند صعودی و سیگنال خرید است.
+                        ROC منفی نشان‌دهنده روند نزولی و سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: ROC > 0</span>
+                        <span class="sell-signal">فروش: ROC < 0</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">ATR (میانگین دامنه واقعی)</div>
+                    <div class="indicator-description">
+                        ATR نوسانات بازار را اندازه‌گیری می‌کند و برای تعیین stop loss استفاده می‌شود.
+                        ATR بالا نشان‌دهنده نوسانات زیاد است.
+                        ATR پایین نشان‌دهنده بازار آرام است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">نوسان بالا: ATR بالا</span>
+                        <span class="sell-signal">نوسان پایین: ATR پایین</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Parabolic SAR</div>
+                    <div class="indicator-description">
+                        Parabolic SAR نقاط ورود و خروج احتمالی را نشان می‌دهد.
+                        وقتی نقاط SAR زیر قیمت باشند، سیگنال خرید است.
+                        وقتی نقاط SAR بالای قیمت باشند، سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: SAR زیر قیمت</span>
+                        <span class="sell-signal">فروش: SAR بالای قیمت</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Commodity Channel Index</div>
+                    <div class="indicator-description">
+                        CCI انحراف قیمت از میانگین متحرک آن را نشان می‌دهد.
+                        مقادیر بالای +100 اشباع خرید و مقادیر زیر -100 اشباع فروش را نشان می‌دهد.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: CCI از -100 عبور کند</span>
+                        <span class="sell-signal">فروش: CCI از +100 عبور کند</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Money Flow Index</div>
+                    <div class="indicator-description">
+                        MFI RSI را با حجم معاملات ترکیب می‌کند.
+                        مقادیر بالای 80 اشباع خرید و مقادیر زیر 20 اشباع فروش را نشان می‌دهد.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: MFI < 20</span>
+                        <span class="sell-signal">فروش: MFI > 80</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Aroon</div>
+                    <div class="indicator-description">
+                        Aroon قدرت روند و تغییرات احتمالی آن را شناسایی می‌کند.
+                        Aroon Up بالای 70 نشان‌دهنده روند صعودی قوی است.
+                        Aroon Down بالای 70 نشان‌دهنده روند نزولی قوی است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: Aroon Up > 70</span>
+                        <span class="sell-signal">فروش: Aroon Down > 70</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Fibonacci Retracement</div>
+                    <div class="indicator-description">
+                        سطوح فیبوناچی نقاط حمایت و مقاومت احتمالی را نشان می‌دهد.
+                        سطوح 38.2% و 61.8% مهم‌ترین سطوح بازگشت هستند.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: در سطح حمایت فیبو</span>
+                        <span class="sell-signal">فروش: در سطح مقاومت فیبو</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Ichimoku Cloud</div>
+                    <div class="indicator-description">
+                        ایچیموکو یک سیستم کامل تحلیل تکنیکال است که روند، حمایت و مقاومت را نشان می‌دهد.
+                        قیمت بالای ابر، سیگنال خرید و قیمت زیر ابر، سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: قیمت بالای ابر</span>
+                        <span class="sell-signal">فروش: قیمت زیر ابر</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Elder Ray</div>
+                    <div class="indicator-description">
+                        Elder Ray قدرت خریداران و فروشندگان را اندازه‌گیری می‌کند.
+                        Bull Power مثبت نشان‌دهنده قدرت خریداران است.
+                        Bear Power منفی نشان‌دهنده قدرت فروشندگان است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: Bull Power > 0</span>
+                        <span class="sell-signal">فروش: Bear Power < 0</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Keltner Channel</div>
+                    <div class="indicator-description">
+                        کانال کلتنر شبیه نوارهای بولینگر عمل می‌کند اما از ATR استفاده می‌کند.
+                        قیمت بالای کانال بالایی سیگنال فروش است.
+                        قیمت زیر کانال پایینی سیگنال خرید است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: قیمت زیر کانال پایین</span>
+                        <span class="sell-signal">فروش: قیمت بالای کانال بالا</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Chande Momentum</div>
+                    <div class="indicator-description">
+                        CMO مومنتوم قیمت را بدون در نظر گیری حجم اندازه‌گیری می‌کند.
+                        مقادیر بالای +50 اشباع خرید و مقادیر زیر -50 اشباع فروش را نشان می‌دهد.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: CMO < -50</span>
+                        <span class="sell-signal">فروش: CMO > +50</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Donchian Channel</div>
+                    <div class="indicator-description">
+                        کانال دانچین از بالاترین و پایین‌ترین قیمت در دوره مشخص تشکیل می‌شود.
+                        شکست کانال بالایی سیگنال خرید است.
+                        شکست کانال پایینی سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: شکست کانال بالا</span>
+                        <span class="sell-signal">فروش: شکست کانال پایین</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Force Index</div>
+                    <div class="indicator-description">
+                        شاخص نیرو قیمت و حجم را ترکیب می‌کند تا قدرت حرکت را اندازه‌گیری کند.
+                        مقادیر مثبت نشان‌دهنده فشار خرید است.
+                        مقادیر منفی نشان‌دهنده فشار فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: Force Index مثبت</span>
+                        <span class="sell-signal">فروش: Force Index منفی</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Mass Index</div>
+                    <div class="indicator-description">
+                        شاخص توده تغییرات در دامنه قیمت را اندازه‌گیری می‌کند.
+                        مقادیر بالای 27 نشان‌دهنده بازگشت احتمالی روند است.
+                        مقادیر زیر 26.5 نشان‌دهنده ادامه روند است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">بازگشت: Mass Index > 27</span>
+                        <span class="sell-signal">ادامه روند: Mass Index < 26.5</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Price Rate of Change</div>
+                    <div class="indicator-description">
+                        PROC درصد تغییر قیمت را در دوره مشخص نشان می‌دهد.
+                        مقادیر مثبت نشان‌دهنده صعود قیمت است.
+                        مقادیر منفی نشان‌دهنده نزول قیمت است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: PROC > 0</span>
+                        <span class="sell-signal">فروش: PROC < 0</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Trix</div>
+                    <div class="indicator-description">
+                        TRIX نوسانات میان‌مدت را فیلتر می‌کند و روند اصلی را نشان می‌دهد.
+                        عبور TRIX از بالای خط صفر سیگنال خرید است.
+                        عبور TRIX از زیر خط صفر سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: TRIX > 0</span>
+                        <span class="sell-signal">فروش: TRIX < 0</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Ultimate Oscillator</div>
+                    <div class="indicator-description">
+                        نوسان‌گر نهایی سه دوره زمانی مختلف را ترکیب می‌کند.
+                        مقادیر بالای 70 اشباع خرید و مقادیر زیر 30 اشباع فروش را نشان می‌دهد.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: UO < 30</span>
+                        <span class="sell-signal">فروش: UO > 70</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Vortex Indicator</div>
+                    <div class="indicator-description">
+                        VI روند و نقاط بازگشت را شناسایی می‌کند.
+                        وقتی VI+ بالای VI- باشد، روند صعودی است.
+                        وقتی VI- بالای VI+ باشد، روند نزولی است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: VI+ > VI-</span>
+                        <span class="sell-signal">فروش: VI- > VI+</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Zig Zag</div>
+                    <div class="indicator-description">
+                        زیگ زاگ نوسانات کوچک را فیلتر می‌کند و روند اصلی را نشان می‌دهد.
+                        تغییر جهت زیگ زاگ نشان‌دهنده تغییر روند است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: تغییر به روند صعودی</span>
+                        <span class="sell-signal">فروش: تغییر به روند نزولی</span>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-title">Know Sure Thing (KST)</div>
+                    <div class="indicator-description">
+                        KST چهار دوره زمانی مختلف ROC را ترکیب می‌کند.
+                        عبور KST از بالای خط سیگنال، سیگنال خرید است.
+                        عبور KST از زیر خط سیگنال، سیگنال فروش است.
+                    </div>
+                    <div class="signal-status">
+                        <span class="buy-signal">خرید: KST > Signal Line</span>
+                        <span class="sell-signal">فروش: KST < Signal Line</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(section) {
+            // پنهان کردن همه بخش‌ها
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // نمایش بخش انتخابی
+            document.getElementById(section).classList.add('active');
+            
+            // به‌روزرسانی دکمه‌های ناوبری
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // بارگذاری سیگنال‌ها
+        function loadSignals() {
+            const signals = JSON.parse(localStorage.getItem('signals') || '[]');
+            const container = document.getElementById('signalsContainer');
+            
+            if (signals.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: white; font-size: 18px; padding: 50px;">هیچ سیگنالی موجود نیست</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            signals.forEach((signal, index) => {
+                const signalCard = document.createElement('div');
+                signalCard.className = 'signal-card';
+                signalCard.innerHTML = `
+                    <div class="signal-header">
+                        <div class="signal-type">سیگنال ${index + 1}</div>
+                        <div class="signal-time">${new Date(signal.time).toLocaleString('fa-IR')}</div>
+                    </div>
+                    <div class="signal-content">${signal.content}</div>
+                `;
+                container.appendChild(signalCard);
+            });
+        }
+
+        // اجرای توابع هنگام بارگذاری صفحه
+        window.onload = function() {
+            loadSignals();
+        };
+    </script>
+</body>
+</html>

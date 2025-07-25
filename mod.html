@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت و تنظیمات</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-btn {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .admin-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #4facfe;
+        }
+
+        .admin-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-title {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .pending-sites, .pending-reports {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .pending-sites.active, .pending-reports.active {
+            display: block;
+        }
+
+        .pending-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .pending-item h4 {
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+
+        .pending-item p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            margin-top: 15px;
+        }
+
+        .approve-btn {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .reject-btn {
+            background: linear-gradient(145deg, #fa709a, #fee140);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .approve-btn:hover, .reject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .language-selector {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .language-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .language-options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .language-btn {
+            background: linear-gradient(145deg, #4facfe, #00f2fe);
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .language-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .language-btn.active {
+            background: linear-gradient(145deg, #43e97b, #38f9d7);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #43e97b;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .language-options {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="location.href='index.html'">← بازگشت</button>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('admin')">مدیریت</button>
+            <button class="nav-btn" onclick="showSection('language')">زبان</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- بخش مدیریت -->
+        <div id="admin" class="section active">
+            <!-- فرم ورود مدیریت -->
+            <div class="login-form" id="loginForm">
+                <div class="login-title">ورود مدیریت</div>
+                <input type="password" class="password-input" id="adminPassword" placeholder="رمز عبور را وارد کنید">
+                <button class="login-btn" onclick="adminLogin()">ورود</button>
+                <div class="error-message" id="loginError"></div>
+            </div>
+
+            <!-- پنل مدیریت -->
+            <div class="admin-panel" id="adminPanel">
+                <div class="admin-grid">
+                    <div class="admin-card" onclick="showForm('globalMessage')">
+                        <h3>📢 ارسال پیام همگانی</h3>
+                        <p>ارسال پیام به تمام کاربران سایت</p>
+                    </div>
+                    
+                    <div class="admin-card" onclick="showForm('signal')">
+                        <h3>📊 ارسال سیگنال</h3>
+                        <p>ارسال سیگنال جدید به بخش سیگنال‌ها</p>
+                    </div>
+                    
+                    <div class="admin-card" onclick="showForm('advertisement')">
+                        <h3>📺 ارسال تبلیغ</h3>
+                        <p>اضافه کردن تبلیغ جدید به صفحه اصلی</p>
+                    </div>
+                    
+                    <div class="admin-card" onclick="showPendingSites()">
+                        <h3>✅ تایید یا رد آگهی</h3>
+                        <p>مدیریت سایت‌های در انتظار تایید</p>
+                    </div>
+                    
+                    <div class="admin-card" onclick="showReportedSites()">
+                        <h3>🗑️ حذف آگهی‌های کلاهبرداری</h3>
+                        <p>مدیریت گزارش‌های کاربران</p>
+                    </div>
+                </div>
+
+                <!-- فرم ارسال پیام همگانی -->
+                <div class="form-container" id="globalMessageForm">
+                    <div class="form-title">ارسال پیام همگانی</div>
+                    <textarea class="form-input form-textarea" id="messageText" placeholder="متن پیام را وارد کنید"></textarea>
+                    <button class="submit-btn" onclick="sendGlobalMessage()">ارسال پیام</button>
+                    <div class="success-message" id="messageSuccess" style="display: none;"></div>
+                </div>
+
+                <!-- فرم ارسال سیگنال -->
+                <div class="form-container" id="signalForm">
+                    <div class="form-title">ارسال سیگنال جدید</div>
+                    <textarea class="form-input form-textarea" id="signalText" placeholder="محتوای سیگنال را وارد کنید"></textarea>
+                    <button class="submit-btn" onclick="sendSignal()">ارسال سیگنال</button>
+                    <div class="success-message" id="signalSuccess" style="display: none;"></div>
+                </div>
+
+                <!-- فرم ارسال تبلیغ -->
+                <div class="form-container" id="advertisementForm">
+                    <div class="form-title">ارسال تبلیغ جدید</div>
+                    <input type="url" class="form-input" id="adLink" placeholder="لینک سایت تبلیغاتی">
+                    <textarea class="form-input" id="adDescription" placeholder="توضیحات تبلیغ" rows="3"></textarea>
+                    <select class="form-select" id="adDuration">
+                        <option value="24">24 ساعت</option>
+                        <option value="48">48 ساعت</option>
+                        <option value="720">1 ماه</option>
+                    </select>
+                    <button class="submit-btn" onclick="sendAdvertisement()">ارسال تبلیغ</button>
+                    <div class="success-message" id="adSuccess" style="display: none;"></div>
+                </div>
+
+                <!-- لیست سایت‌های در انتظار تایید -->
+                <div class="pending-sites" id="pendingSites">
+                    <div class="form-title">سایت‌های در انتظار تایید</div>
+                    <div id="pendingSitesList"></div>
+                </div>
+
+                <!-- لیست گزارش‌های کاربران -->
+                <div class="pending-reports" id="pendingReports">
+                    <div class="form-title">گزارش‌های کاربران</div>
+                    <div id="reportedSitesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- بخش زبان -->
+        <div id="language" class="section">
+            <div class="language-selector">
+                <div class="language-title">انتخاب زبان</div>
+                <div class="language-options">
+                    <button class="language-btn active" onclick="setLanguage('fa')">فارسی</button>
+                    <button class="language-btn" onclick="setLanguage('en')">English</button>
+                </div>
+                <p style="margin-top: 20px; opacity: 0.8;">تغییر زبان به زودی اعمال خواهد شد</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // رمز مدیریت (رمزگذاری شده)
+        const adminPasswordHash = btoa('12345+!@#$%54321'); // رمز رمزگذاری شده
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            document.getElementById(section).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function adminLogin() {
+            const enteredPassword = document.getElementById('adminPassword').value;
+            const enteredHash = btoa(enteredPassword);
+            
+            if (enteredHash === adminPasswordHash) {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').classList.add('active');
+                document.getElementById('loginError').textContent = '';
+            } else {
+                document.getElementById('loginError').textContent = 'رمز عبور اشتباه است';
+            }
+        }
+
+        function showForm(formType) {
+            // پنهان کردن همه فرم‌ها
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.querySelectorAll('.pending-sites, .pending-reports').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // نمایش فرم انتخابی
+            document.getElementById(formType + 'Form').classList.add('active');
+        }
+
+        function sendGlobalMessage() {
+            const message = document.getElementById('messageText').value;
+            if (message.trim()) {
+                localStorage.setItem('globalMessage', message);
+                localStorage.setItem('globalMessageTime', new Date().getTime().toString());
+                
+                document.getElementById('messageSuccess').textContent = 'پیام با موفقیت ارسال شد';
+                document.getElementById('messageSuccess').style.display = 'block';
+                document.getElementById('messageText').value = '';
+                
+                setTimeout(() => {
+                    document.getElementById('messageSuccess').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function sendSignal() {
+            const signalText = document.getElementById('signalText').value;
+            if (signalText.trim()) {
+                let signals = JSON.parse(localStorage.getItem('signals') || '[]');
+                signals.unshift({
+                    content: signalText,
+                    time: new Date().getTime()
+                });
+                localStorage.setItem('signals', JSON.stringify(signals));
+                
+                document.getElementById('signalSuccess').textContent = 'سیگنال با موفقیت ارسال شد';
+                document.getElementById('signalSuccess').style.display = 'block';
+                document.getElementById('signalText').value = '';
+                
+                setTimeout(() => {
+                    document.getElementById('signalSuccess').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function sendAdvertisement() {
+            const link = document.getElementById('adLink').value;
+            const description = document.getElementById('adDescription').value;
+            const duration = parseInt(document.getElementById('adDuration').value);
+            
+            if (link && description) {
+                let ads = JSON.parse(localStorage.getItem('advertisements') || '[]');
+                ads.push({
+                    link: link,
+                    description: description,
+                    duration: duration,
+                    time: new Date().getTime()
+                });
+                localStorage.setItem('advertisements', JSON.stringify(ads));
+                
+                document.getElementById('adSuccess').textContent = 'تبلیغ با موفقیت ارسال شد';
+                document.getElementById('adSuccess').style.display = 'block';
+                document.getElementById('adLink').value = '';
+                document.getElementById('adDescription').value = '';
+                
+                setTimeout(() => {
+                    document.getElementById('adSuccess').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function showPendingSites() {
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.querySelectorAll('.pending-reports').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById('pendingSites').classList.add('active');
+            loadPendingSites();
+        }
+
+        function showReportedSites() {
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.querySelectorAll('.pending-sites').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById('pendingReports').classList.add('active');
+            loadReportedSites();
+        }
+
+        function loadPendingSites() {
+            const pendingSites = JSON.parse(localStorage.getItem('pendingSites') || '[]');
+            const container = document.getElementById('pendingSitesList');
+            
+            if (pendingSites.length === 0) {
+                container.innerHTML = '<p style="color: white; text-align: center;">هیچ سایت در انتظار تایید وجود ندارد</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            pendingSites.forEach((site, index) => {
+                const siteDiv = document.createElement('div');
+                siteDiv.className = 'pending-item';
+                siteDiv.innerHTML = `
+                    <h4>${site.name}</h4>
+                    <p><strong>لینک:</strong> ${site.link}</p>
+                    <p><strong>توضیحات:</strong> ${site.description}</p>
+                    <p><strong>ایمیل:</strong> ${site.email}</p>
+                    <p><strong>تاریخ ثبت:</strong> ${new Date(site.submissionTime).toLocaleString('fa-IR')}</p>
+                    <div class="action-buttons">
+                        <button class="approve-btn" onclick="approveSite(${index})">تایید</button>
+                        <button class="reject-btn" onclick="rejectSite(${index})">رد</button>
+                    </div>
+                `;
+                container.appendChild(siteDiv);
+            });
+        }
+
+        function approveSite(index) {
+            let pendingSites = JSON.parse(localStorage.getItem('pendingSites') || '[]');
+            let approvedSites = JSON.parse(localStorage.getItem('approvedSites') || '[]');
+            
+            const site = pendingSites[index];
+            site.approvalTime = new Date().getTime();
+            approvedSites.push(site);
+            
+            pendingSites.splice(index, 1);
+            
+            localStorage.setItem('pendingSites', JSON.stringify(pendingSites));
+            localStorage.setItem('approvedSites', JSON.stringify(approvedSites));
+            
+            loadPendingSites();
+        }
+
+        function rejectSite(index) {
+            let pendingSites = JSON.parse(localStorage.getItem('pendingSites') || '[]');
+            pendingSites.splice(index, 1);
+            localStorage.setItem('pendingSites', JSON.stringify(pendingSites));
+            loadPendingSites();
+        }
+
+        function loadReportedSites() {
+            const reportedSites = JSON.parse(localStorage.getItem('reportedSites') || '[]');
+            const container = document.getElementById('reportedSitesList');
+            
+            if (reportedSites.length === 0) {
+                container.innerHTML = '<p style="color: white; text-align: center;">هیچ گزارشی وجود ندارد</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            reportedSites.forEach((report, index) => {
+                const reportDiv = document.createElement('div');
+                reportDiv.className = 'pending-item';
+                reportDiv.innerHTML = `
+                    <h4>گزارش ${index + 1}</h4>
+                    <p><strong>سایت:</strong> ${report.siteName}</p>
+                    <p><strong>دلیل گزارش:</strong> ${report.reason}</p>
+                    <p><strong>تاریخ گزارش:</strong> ${new Date(report.reportTime).toLocaleString('fa-IR')}</p>
+                    <div class="action-buttons">
+                        <button class="reject-btn" onclick="deleteReportedSite(${index})">حذف</button>
+                    </div>
+                `;
+                container.appendChild(reportDiv);
+            });
+        }
+
+        function deleteReportedSite(index) {
+            let reportedSites = JSON.parse(localStorage.getItem('reportedSites') || '[]');
+            reportedSites.splice(index, 1);
+            localStorage.setItem('reportedSites', JSON.stringify(reportedSites));
+            loadReportedSites();
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLanguage', lang);
+            
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // در نسخه کامل، اینجا تمام متن‌های سایت تغییر می‌کنند
+            alert(lang === 'fa' ? 'زبان به فارسی تغییر یافت' : 'Language changed to English');
+        }
+
+        // بررسی وضعیت ورود هنگام بارگذاری صفحه
+        window.onload = function() {
+            const selectedLanguage = localStorage.getItem('selectedLanguage') || 'fa';
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[onclick="setLanguage('${selectedLanguage}')"]`).classList.add('active');
+        };
+    </script>
+</body>
+</html>
